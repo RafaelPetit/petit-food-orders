@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pedidos")
+@RequestMapping("/orders")
 public class PedidoController {
 
     @Autowired
@@ -51,16 +51,11 @@ public class PedidoController {
     }
 
 
-    @PutMapping("/{id}/pago")
+    @PutMapping("/{id}/paid")
     public ResponseEntity<Void> aprovaPagamento(@PathVariable @NotNull Long id) {
         service.aprovaPagamentoPedido(id);
 
         return ResponseEntity.ok().build();
 
-    }
-
-    @GetMapping("/port")
-    public String returnPort(@Value("${local.server.port}") String port) {
-        return String.format("Requisição respondida pela instância rodando na porta %s", port);
     }
 }
