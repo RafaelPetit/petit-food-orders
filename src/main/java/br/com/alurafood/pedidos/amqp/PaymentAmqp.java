@@ -1,8 +1,12 @@
 package br.com.alurafood.pedidos.amqp;
 
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,5 +22,30 @@ public class PaymentAmqp {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter);
         return rabbitTemplate;
+    }
+
+    @Bean
+    public Queue paymentQueue() {
+        return QueueBuilder.nonDurable("payment.order-details").build();
+    }
+
+    @Bean
+    public FanoutExchange paymentExchange() {
+        return ExchangeBuilder.fanoutExchange("payment.exchange").build();
+    }
+
+    @Bean
+    public Binding bindPaymentQueue(FanoutExchange paymentExchange) {
+        return BindingBuilder.bind(paymentQueue()).to(paymentExchange);
+    }
+
+    @Bean
+    public RabbitAdmin criaRabbitAdmin(ConnectionFactory conn) {
+        return new RabbitAdmin(conn);
+    }
+
+    @Bean
+    public ApplicationListener<ApplicationReadyEvent> inicializaAdmin(RabbitAdmin rabbitAdmin) {
+        return event -> rabbitAdmin.initialize();
     }
 }

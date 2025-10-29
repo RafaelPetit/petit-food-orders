@@ -3,13 +3,14 @@ package br.com.alurafood.pedidos.amqp;
 import br.com.alurafood.pedidos.dto.PaymentDto;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PaymentListener {
 
-    @RabbitListener(queues = "payment.confirmed")
-    public void receivePaymentConfirmation(PaymentDto payment) {
+    @RabbitListener(queues = "payment.order-details")
+    public void receivePaymentConfirmation(@Payload PaymentDto payment) {
         String message = """
                 Dados do pagamento recebido:
                 ID: %d
