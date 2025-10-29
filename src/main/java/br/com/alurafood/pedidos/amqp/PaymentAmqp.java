@@ -26,17 +26,44 @@ public class PaymentAmqp {
 
     @Bean
     public Queue paymentQueue() {
-        return QueueBuilder.nonDurable("payment.order-details").build();
+        return QueueBuilder
+                .nonDurable("payment.order-details")
+                .deadLetterExchange("payment.dlx")
+                .build();
+    }
+    @Bean
+    public Queue dqlPaymentQueue() {
+        return QueueBuilder
+                .nonDurable("payment.order-details-dlq")
+                .build();
     }
 
     @Bean
     public FanoutExchange paymentExchange() {
-        return ExchangeBuilder.fanoutExchange("payment.exchange").build();
+        return ExchangeBuilder
+                .fanoutExchange("payment.exchange")
+                .build();
     }
 
     @Bean
-    public Binding bindPaymentQueue(FanoutExchange paymentExchange) {
-        return BindingBuilder.bind(paymentQueue()).to(paymentExchange);
+    public FanoutExchange dlxPaymentExchange() {
+        return ExchangeBuilder
+                .fanoutExchange("payment.dlx")
+                .build();
+    }
+
+    @Bean
+    public Binding bindPaymentQueue() {
+        return BindingBuilder
+                .bind(paymentQueue())
+                .to(paymentExchange());
+    }
+
+    @Bean
+    public Binding bindDlxPaymentQueue() {
+        return BindingBuilder
+                .bind(dqlPaymentQueue())
+                .to(dlxPaymentExchange());
     }
 
     @Bean

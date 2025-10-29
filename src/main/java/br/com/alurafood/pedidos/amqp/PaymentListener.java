@@ -11,6 +11,10 @@ public class PaymentListener {
 
     @RabbitListener(queues = "payment.order-details")
     public void receivePaymentConfirmation(@Payload PaymentDto payment) {
+        if(payment.getCardNumber().equals("0000")) {
+            throw new RuntimeException("Número de cartão inválido recebido: " + payment.getCardNumber());
+        }
+
         String message = """
                 Dados do pagamento recebido:
                 ID: %d
