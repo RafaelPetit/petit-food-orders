@@ -8,7 +8,7 @@ RUN mvn clean install -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 
-COPY --from=build /app/target/pedidos-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --from=build /app/target/orders-0.0.1-SNAPSHOT.jar /app/app.jar
 
 WORKDIR /app
 
